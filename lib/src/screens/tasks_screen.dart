@@ -1,24 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
-import '../widgets/add_task_form.dart';
+import '/src/app/repository.dart';
 import '/src/widgets/task_card.dart';
 import '/src/models/task.dart';
 
+// ignore: unused_import
+import '/src/widgets/add_task_form.dart';
+
 class TasksScreen extends StatelessWidget {
-  const TasksScreen({super.key});
+  TasksScreen({super.key});
+
+  final repository = Repository();
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Expanded(
-          child: ListView(
-            children: tasks
-                .map(
-                  (task) => TaskCard(task),
-                )
-                .toList(),
-          ),
+          child: StreamBuilder<List<Task>>(
+              stream: repository.listenTasks(),
+              builder: (context, snapshot) {
+                return SlidableAutoCloseBehavior(
+                  child: ListView(
+                    children: snapshot.hasData
+                        ? snapshot.data!
+                            .map(
+                              (task) => TaskCard(task),
+                            )
+                            .toList()
+                        : [],
+                  ),
+                );
+              }),
         ),
         SizedBox(
           height: 50,
@@ -27,8 +41,8 @@ class TasksScreen extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,
             ),
-            onPressed: () => Scaffold.of(context)
-                .showBottomSheet((context) => const AddTaskForm()),
+            onPressed: () => Scaffold.of(context).showBottomSheet(
+                (context) => const TaskForm(title: "Add new task")),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

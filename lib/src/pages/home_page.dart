@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_sandbox/src/pages/settings_page.dart';
 
 import '../screens/tasks_screen.dart';
+import '/src/app/repository.dart';
+import '/src/pages/settings_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,8 +14,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String _selectedScreen = "Tasks";
   static final Map<String, Widget> _screens = {
-    "Tasks": const TasksScreen(),
-    // TODO: add screens
+    "Tasks": TasksScreen(),
     // "Categories": Text('Categories'),
     // "Archive": const Text('Archive'),
     // "Trash": const Text('Trash'),
@@ -25,6 +25,8 @@ class _HomePageState extends State<HomePage> {
       _selectedScreen = screen;
     });
   }
+
+  final repository = Repository();
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +61,14 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
               const Spacer(),
+              // ListTile(
+              //   leading: const Icon(Icons.restart_alt),
+              //   title: const Text('Mock tasks'),
+              //   onTap: () {
+              //     Navigator.pop(context);
+              //     repository.mockTasks();
+              //   },
+              // ),
               ListTile(
                 leading: const Icon(Icons.settings),
                 title: const Text('Settings'),

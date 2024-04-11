@@ -1,9 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_sandbox/src/models/task.dart';
 
-class AddTaskForm extends StatelessWidget {
-  const AddTaskForm({
-    super.key,
-  });
+import '/src/app/repository.dart';
+
+class TaskForm extends StatefulWidget {
+  const TaskForm({super.key, required this.title, this.task});
+
+  final String title;
+  final Task? task;
+
+  @override
+  State<TaskForm> createState() => _TaskFormState();
+}
+
+class _TaskFormState extends State<TaskForm> {
+  final repository = Repository();
+
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.task != null) {
+      _titleController.text = widget.task!.title;
+      _descriptionController.text = widget.task!.description;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +43,11 @@ class AddTaskForm extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
+            Text(widget.title, style: const TextStyle(fontSize: 20)),
             const SizedBox(height: 10),
             TextFormField(
               autofocus: true,
+              controller: _titleController,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Title',
@@ -30,6 +55,7 @@ class AddTaskForm extends StatelessWidget {
             ),
             const SizedBox(height: 15),
             TextFormField(
+              controller: _descriptionController,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Description',
@@ -45,15 +71,33 @@ class AddTaskForm extends StatelessWidget {
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                   label: Text('Cancel',
                       style: TextStyle(color: Colors.white.withOpacity(0.9))),
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
                 ),
                 ElevatedButton.icon(
-                  icon: Icon(Icons.add, color: Colors.white.withOpacity(0.9)),
+                  icon: Icon(Icons.save, color: Colors.white.withOpacity(0.9)),
                   style:
                       ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                  label: Text('Add task',
+                  label: Text('Save',
                       style: TextStyle(color: Colors.white.withOpacity(0.9))),
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () async {
+                    if (widget.task != null) {
+                      widget.task!.title = _titleController.text;
+                      widget.task!.description = _descriptionController.text;
+
+                      await repository.saveTask(widget.task!);
+                    } else {
+                      await repository.saveTask(Task(
+                        title: _titleController.text,
+                        description: _descriptionController.text,
+                      ));
+                    }
+
+                    if (!context.mounted) return;
+
+                    Navigator.pop(context);
+                  },
                 ),
               ],
             )
