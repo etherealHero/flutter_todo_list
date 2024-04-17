@@ -35,9 +35,6 @@ class _TaskFormState extends State<TaskForm> {
       child: Container(
         padding: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
-          border: Border.all(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              width: 2.0),
           borderRadius: BorderRadius.circular(24.0),
         ),
         child: Column(
@@ -66,11 +63,10 @@ class _TaskFormState extends State<TaskForm> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ElevatedButton.icon(
-                  icon: Icon(Icons.close, color: Colors.white.withOpacity(0.9)),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                TextButton.icon(
+                  icon: Icon(Icons.close, color: Colors.red.shade300),
                   label: Text('Cancel',
-                      style: TextStyle(color: Colors.white.withOpacity(0.9))),
+                      style: TextStyle(color: Colors.red.shade300)),
                   onPressed: () {
                     Navigator.pop(context);
                   },

@@ -21,17 +21,22 @@ class TasksScreen extends StatelessWidget {
           child: StreamBuilder<List<Task>>(
               stream: repository.listenTasks(),
               builder: (context, snapshot) {
-                return SlidableAutoCloseBehavior(
-                  child: ListView(
-                    children: snapshot.hasData
-                        ? snapshot.data!
-                            .map(
-                              (task) => TaskCard(task),
-                            )
-                            .toList()
-                        : [],
-                  ),
-                );
+                return snapshot.hasData && snapshot.data!.isNotEmpty
+                    ? SlidableAutoCloseBehavior(
+                        child: ListView(
+                          children: snapshot.data!
+                              .map(
+                                (task) => TaskCard(task),
+                              )
+                              .toList(),
+                        ),
+                      )
+                    : Center(
+                        child: Text(
+                        'Task list is empty. \nPress "+ New task" button',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ));
               }),
         ),
         SizedBox(
