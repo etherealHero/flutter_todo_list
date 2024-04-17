@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 import '/src/app/repository.dart';
-import '/src/widgets/task_card.dart';
+import '/src/app/layout.dart';
 import '/src/models/task.dart';
-
-// ignore: unused_import
+import '/src/widgets/task_card.dart';
 import '/src/widgets/add_task_form.dart';
+
+var tasksScreen = Screen(
+  screen: TasksScreen(),
+  bottomNavigationBar: const TasksBottomBar(),
+);
 
 class TasksScreen extends StatelessWidget {
   TasksScreen({super.key});
@@ -39,34 +43,49 @@ class TasksScreen extends StatelessWidget {
                       ));
               }),
         ),
-        SizedBox(
-          height: 50,
-          width: double.infinity,
-          child: ElevatedButton(
+      ],
+    );
+  }
+}
+
+class TasksBottomBar extends StatelessWidget {
+  const TasksBottomBar({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BottomAppBar(
+      elevation: 4,
+      child: Row(
+        children: <Widget>[
+          const Spacer(),
+          ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-            ),
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                padding: const EdgeInsets.all(20)),
             onPressed: () => Scaffold.of(context).showBottomSheet(
-                (context) => const TaskForm(title: "Add new task")),
+              (context) => const TaskForm(title: "Add new task"),
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
                   Icons.add,
-                  color: Colors.white.withOpacity(0.9),
+                  color: Theme.of(context).colorScheme.onPrimary,
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  'New task',
+                  'Add',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
               ],
             ),
-          ),
-        ),
-      ],
+          )
+        ],
+      ),
     );
   }
 }

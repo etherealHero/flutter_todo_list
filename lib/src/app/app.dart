@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_sandbox/src/app/theme_provider.dart';
-import 'package:flutter_sandbox/src/pages/home_page.dart';
+
+import 'theme_provider.dart';
+import '/src/pages/home_page.dart';
 
 class App extends StatelessWidget {
   const App({super.key, required this.themeController});

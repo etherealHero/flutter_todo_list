@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_sandbox/src/app/layout.dart';
 import 'package:flutter_sandbox/src/models/task.dart';
 
 import '/src/app/repository.dart';
@@ -19,13 +20,22 @@ class _TaskFormState extends State<TaskForm> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
+  late FocusNode _titleFocusNode;
+
   @override
   void initState() {
     super.initState();
+    _titleFocusNode = FocusNode();
     if (widget.task != null) {
       _titleController.text = widget.task!.title;
       _descriptionController.text = widget.task!.description;
     }
+  }
+
+  @override
+  void dispose() {
+    _titleFocusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -44,6 +54,7 @@ class _TaskFormState extends State<TaskForm> {
             const SizedBox(height: 10),
             TextFormField(
               autofocus: true,
+              focusNode: _titleFocusNode,
               controller: _titleController,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
@@ -78,6 +89,12 @@ class _TaskFormState extends State<TaskForm> {
                   label: Text('Save',
                       style: TextStyle(color: Colors.white.withOpacity(0.9))),
                   onPressed: () async {
+                    if (_titleController.text.trim().isEmpty) {
+                      showSnackBarFun(context, "Title shouldn't be empty");
+                      _titleFocusNode.requestFocus();
+                      return;
+                    }
+
                     if (widget.task != null) {
                       widget.task!.title = _titleController.text;
                       widget.task!.description = _descriptionController.text;
