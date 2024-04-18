@@ -25,6 +25,10 @@ class TasksScreen extends StatelessWidget {
           child: StreamBuilder<List<Task>>(
               stream: repository.listenTasks(),
               builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                }
+
                 return snapshot.hasData && snapshot.data!.isNotEmpty
                     ? SlidableAutoCloseBehavior(
                         child: ListView(

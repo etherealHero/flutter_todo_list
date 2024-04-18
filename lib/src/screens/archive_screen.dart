@@ -25,6 +25,10 @@ class ArchiveScreen extends StatelessWidget {
           child: StreamBuilder<List<Task>>(
               stream: repository.listenArchivedTasks(),
               builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                }
+
                 return snapshot.hasData && snapshot.data!.isNotEmpty
                     ? SlidableAutoCloseBehavior(
                         child: ListView(
@@ -39,7 +43,7 @@ class ArchiveScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Archive is empty',
+                            '${Screens.archive.title} is empty',
                             textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
