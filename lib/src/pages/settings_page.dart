@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '/src/app/theme_provider.dart';
+import '/src/app/repository.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -10,6 +11,8 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  final repository = Repository();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,6 +40,15 @@ class _SettingsPageState extends State<SettingsPage> {
                   value: ThemeController.of(context).currentTheme == "dark",
                 ),
               ],
+            ),
+            const Spacer(),
+            ListTile(
+              leading: const Icon(Icons.restart_alt),
+              title: const Text('Migrate'),
+              onTap: () {
+                Navigator.pop(context);
+                repository.migrate();
+              },
             ),
           ],
         ),

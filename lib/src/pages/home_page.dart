@@ -64,16 +64,7 @@ class HomePageState extends State<HomePage> {
                 Navigator.pop(context);
               },
             ),
-
             const Spacer(),
-            // ListTile(
-            //   leading: const Icon(Icons.restart_alt),
-            //   title: const Text('Migrate'),
-            //   onTap: () {
-            //     Navigator.pop(context);
-            //     repository.migrate();
-            //   },
-            // ),
             ListTile(
               leading: const Icon(Icons.settings),
               title: const Text('Settings'),
