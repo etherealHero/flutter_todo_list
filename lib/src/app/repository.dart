@@ -33,7 +33,21 @@ class Repository {
   Stream<List<Task>> listenTasks() async* {
     var isar = await db;
 
-    yield* isar.tasks.where().watch(fireImmediately: true);
+    yield* isar.tasks
+        .where()
+        .filter()
+        .archivedEqualTo(false)
+        .watch(fireImmediately: true);
+  }
+
+  Stream<List<Task>> listenArchivedTasks() async* {
+    var isar = await db;
+
+    yield* isar.tasks
+        .where()
+        .filter()
+        .archivedEqualTo(true)
+        .watch(fireImmediately: true);
   }
 
   Future<void> saveTask(Task task) async {
@@ -69,6 +83,18 @@ class Repository {
       isar.tasks.putSync(
         Task(title: "Meditation", description: ""),
       );
+    });
+  }
+
+  Future<void> migrate() async {
+    var isar = await db;
+
+    var tasks = isar.tasks.where().findAllSync();
+
+    isar.writeTxnSync(() {
+      for (var task in tasks) {
+        isar.tasks.putSync(task..archived = false);
+      }
     });
   }
 }

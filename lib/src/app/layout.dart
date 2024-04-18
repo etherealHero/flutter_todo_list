@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class Screen {
-  Screen({
+class ScreenLayout {
+  ScreenLayout({
     required this.screen,
     this.bottomNavigationBar,
     this.floatingActionButton,
@@ -12,4 +12,26 @@ class Screen {
   final Widget? bottomNavigationBar;
   final Widget? floatingActionButton;
   final FloatingActionButtonLocation? floatingActionButtonLocation;
+}
+
+enum Screens {
+  tasks(title: "Tasks", icon: Icon(Icons.library_add_check_outlined)),
+  archive(title: "Archive", icon: Icon(Icons.archive_outlined));
+
+  const Screens({
+    required this.title,
+    required this.icon,
+  });
+
+  final String title;
+  final Icon icon;
+}
+
+extension StringCasingExtension on String {
+  String toCapitalized() =>
+      length > 0 ? '${this[0].toUpperCase()}${substring(1).toLowerCase()}' : '';
+  String toTitleCase() => replaceAll(RegExp(' +'), ' ')
+      .split(' ')
+      .map((str) => str.toCapitalized())
+      .join(' ');
 }

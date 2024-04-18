@@ -17,18 +17,23 @@ const TaskSchema = CollectionSchema(
   name: r'Task',
   id: 2998003626758701373,
   properties: {
-    r'checked': PropertySchema(
+    r'archived': PropertySchema(
       id: 0,
+      name: r'archived',
+      type: IsarType.bool,
+    ),
+    r'checked': PropertySchema(
+      id: 1,
       name: r'checked',
       type: IsarType.bool,
     ),
     r'description': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'description',
       type: IsarType.string,
     ),
     r'title': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'title',
       type: IsarType.string,
     )
@@ -64,9 +69,10 @@ void _taskSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeBool(offsets[0], object.checked);
-  writer.writeString(offsets[1], object.description);
-  writer.writeString(offsets[2], object.title);
+  writer.writeBool(offsets[0], object.archived);
+  writer.writeBool(offsets[1], object.checked);
+  writer.writeString(offsets[2], object.description);
+  writer.writeString(offsets[3], object.title);
 }
 
 Task _taskDeserialize(
@@ -76,10 +82,11 @@ Task _taskDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Task(
-    description: reader.readString(offsets[1]),
-    title: reader.readString(offsets[2]),
+    description: reader.readString(offsets[2]),
+    title: reader.readString(offsets[3]),
   );
-  object.checked = reader.readBool(offsets[0]);
+  object.archived = reader.readBool(offsets[0]);
+  object.checked = reader.readBool(offsets[1]);
   object.id = id;
   return object;
 }
@@ -94,8 +101,10 @@ P _taskDeserializeProp<P>(
     case 0:
       return (reader.readBool(offset)) as P;
     case 1:
-      return (reader.readString(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 2:
+      return (reader.readString(offset)) as P;
+    case 3:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -190,6 +199,15 @@ extension TaskQueryWhere on QueryBuilder<Task, Task, QWhereClause> {
 }
 
 extension TaskQueryFilter on QueryBuilder<Task, Task, QFilterCondition> {
+  QueryBuilder<Task, Task, QAfterFilterCondition> archivedEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'archived',
+        value: value,
+      ));
+    });
+  }
+
   QueryBuilder<Task, Task, QAfterFilterCondition> checkedEqualTo(bool value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -531,6 +549,18 @@ extension TaskQueryObject on QueryBuilder<Task, Task, QFilterCondition> {}
 extension TaskQueryLinks on QueryBuilder<Task, Task, QFilterCondition> {}
 
 extension TaskQuerySortBy on QueryBuilder<Task, Task, QSortBy> {
+  QueryBuilder<Task, Task, QAfterSortBy> sortByArchived() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'archived', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Task, Task, QAfterSortBy> sortByArchivedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'archived', Sort.desc);
+    });
+  }
+
   QueryBuilder<Task, Task, QAfterSortBy> sortByChecked() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'checked', Sort.asc);
@@ -569,6 +599,18 @@ extension TaskQuerySortBy on QueryBuilder<Task, Task, QSortBy> {
 }
 
 extension TaskQuerySortThenBy on QueryBuilder<Task, Task, QSortThenBy> {
+  QueryBuilder<Task, Task, QAfterSortBy> thenByArchived() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'archived', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Task, Task, QAfterSortBy> thenByArchivedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'archived', Sort.desc);
+    });
+  }
+
   QueryBuilder<Task, Task, QAfterSortBy> thenByChecked() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'checked', Sort.asc);
@@ -619,6 +661,12 @@ extension TaskQuerySortThenBy on QueryBuilder<Task, Task, QSortThenBy> {
 }
 
 extension TaskQueryWhereDistinct on QueryBuilder<Task, Task, QDistinct> {
+  QueryBuilder<Task, Task, QDistinct> distinctByArchived() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'archived');
+    });
+  }
+
   QueryBuilder<Task, Task, QDistinct> distinctByChecked() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'checked');
@@ -644,6 +692,12 @@ extension TaskQueryProperty on QueryBuilder<Task, Task, QQueryProperty> {
   QueryBuilder<Task, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<Task, bool, QQueryOperations> archivedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'archived');
     });
   }
 

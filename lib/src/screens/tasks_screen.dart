@@ -7,7 +7,7 @@ import '/src/models/task.dart';
 import '/src/widgets/task_card.dart';
 import '/src/widgets/add_task_form.dart';
 
-var tasksScreen = Screen(
+var tasksScreen = ScreenLayout(
   screen: TasksScreen(),
   bottomNavigationBar: const TasksBottomBar(),
 );

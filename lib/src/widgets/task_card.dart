@@ -94,6 +94,31 @@ class _TaskCardState extends State<TaskCard>
           ),
         ],
       ),
+      startActionPane: ActionPane(
+        motion: const DrawerMotion(),
+        children: [
+          CustomSlidableAction(
+            padding: EdgeInsets.zero,
+            backgroundColor: Colors.transparent,
+            onPressed: (context) => repository.saveTask(
+              widget.task..archived = !widget.task.archived,
+            ),
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+              height: double.infinity,
+              width: double.infinity,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: Colors.yellow.shade800,
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(10),
+                ),
+              ),
+              child: Text(widget.task.archived ? 'Unarchive' : 'Archive'),
+            ),
+          ),
+        ],
+      ),
       child: Card(
         elevation: 4,
         child: widget.task.description.isEmpty

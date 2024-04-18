@@ -8,17 +8,11 @@ class Task {
   String title;
   String description;
   bool checked;
+  bool archived;
 
   Task({
     required this.title,
     required this.description,
-  }) : checked = false;
+  })  : checked = false,
+        archived = false;
 }
-
-final List<Task> tasks = [
-  Task(title: "Daily meeting with team", description: ""),
-  Task(title: "Pay for rent", description: "")..checked = true,
-  Task(title: "Check emails", description: ""),
-  Task(title: "Lunch with Emma", description: "Lorem ipsum dolor est"),
-  Task(title: "Meditation", description: ""),
-];
