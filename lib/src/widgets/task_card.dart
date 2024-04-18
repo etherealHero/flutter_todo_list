@@ -26,7 +26,9 @@ class _TaskCardState extends State<TaskCard>
   Widget build(BuildContext context) {
     var leading = Checkbox(
       value: widget.task.checked,
-      onChanged: (v) => repository.saveTask(widget.task..checked = v!),
+      onChanged: !widget.task.archived
+          ? (v) => repository.saveTask(widget.task..checked = v!)
+          : null,
     );
     var title = Text(
       widget.task.title,
@@ -54,69 +56,19 @@ class _TaskCardState extends State<TaskCard>
       groupTag: "0",
       endActionPane: ActionPane(
         motion: const DrawerMotion(),
-        children: [
-          CustomSlidableAction(
-            padding: EdgeInsets.zero,
-            backgroundColor: Colors.transparent,
-            onPressed: (context) => Scaffold.of(context).showBottomSheet(
-                (context) => TaskForm(title: "Edit task", task: widget.task)),
-            child: Container(
-              margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
-              height: double.infinity,
-              width: double.infinity,
-              alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.all(
-                  Radius.circular(10),
-                ),
-              ),
-              child: const Text('Edit'),
-            ),
-          ),
-          CustomSlidableAction(
-            padding: EdgeInsets.zero,
-            backgroundColor: Colors.transparent,
-            onPressed: (context) => repository.deleteTask(widget.task.id!),
-            child: Container(
-              margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
-              height: double.infinity,
-              width: double.infinity,
-              alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                color: Colors.red,
-                borderRadius: BorderRadius.all(
-                  Radius.circular(10),
-                ),
-              ),
-              child: const Text('Delete'),
-            ),
-          ),
-        ],
+        children: widget.task.archived
+            ? [
+                DeleteAction(repository: repository, widget: widget),
+              ]
+            : [
+                EditAction(widget: widget),
+                DeleteAction(repository: repository, widget: widget),
+              ],
       ),
       startActionPane: ActionPane(
         motion: const DrawerMotion(),
         children: [
-          CustomSlidableAction(
-            padding: EdgeInsets.zero,
-            backgroundColor: Colors.transparent,
-            onPressed: (context) => repository.saveTask(
-              widget.task..archived = !widget.task.archived,
-            ),
-            child: Container(
-              margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
-              height: double.infinity,
-              width: double.infinity,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: Colors.yellow.shade800,
-                borderRadius: const BorderRadius.all(
-                  Radius.circular(10),
-                ),
-              ),
-              child: Text(widget.task.archived ? 'Unarchive' : 'Archive'),
-            ),
-          ),
+          ArchiveAction(repository: repository, widget: widget),
         ],
       ),
       child: Card(
@@ -131,6 +83,106 @@ class _TaskCardState extends State<TaskCard>
                 title: title,
                 subtitle: subtitle,
               ),
+      ),
+    );
+  }
+}
+
+class ArchiveAction extends StatelessWidget {
+  const ArchiveAction({
+    super.key,
+    required this.repository,
+    required this.widget,
+  });
+
+  final Repository repository;
+  final TaskCard widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomSlidableAction(
+      padding: EdgeInsets.zero,
+      backgroundColor: Colors.transparent,
+      onPressed: (context) => repository.saveTask(
+        widget.task..archived = !widget.task.archived,
+      ),
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+        height: double.infinity,
+        width: double.infinity,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Colors.yellow.shade800,
+          borderRadius: const BorderRadius.all(
+            Radius.circular(10),
+          ),
+        ),
+        child: Text(widget.task.archived ? 'Unarchive' : 'Archive'),
+      ),
+    );
+  }
+}
+
+class DeleteAction extends StatelessWidget {
+  const DeleteAction({
+    super.key,
+    required this.repository,
+    required this.widget,
+  });
+
+  final Repository repository;
+  final TaskCard widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomSlidableAction(
+      padding: EdgeInsets.zero,
+      backgroundColor: Colors.transparent,
+      onPressed: (context) => repository.deleteTask(widget.task.id!),
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+        height: double.infinity,
+        width: double.infinity,
+        alignment: Alignment.center,
+        decoration: const BoxDecoration(
+          color: Colors.red,
+          borderRadius: BorderRadius.all(
+            Radius.circular(10),
+          ),
+        ),
+        child: const Text('Delete'),
+      ),
+    );
+  }
+}
+
+class EditAction extends StatelessWidget {
+  const EditAction({
+    super.key,
+    required this.widget,
+  });
+
+  final TaskCard widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomSlidableAction(
+      padding: EdgeInsets.zero,
+      backgroundColor: Colors.transparent,
+      onPressed: (context) => Scaffold.of(context).showBottomSheet(
+          (context) => TaskForm(title: "Edit task", task: widget.task)),
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+        height: double.infinity,
+        width: double.infinity,
+        alignment: Alignment.center,
+        decoration: const BoxDecoration(
+          color: Colors.blue,
+          borderRadius: BorderRadius.all(
+            Radius.circular(10),
+          ),
+        ),
+        child: const Text('Edit'),
       ),
     );
   }
