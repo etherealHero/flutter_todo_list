@@ -55,6 +55,11 @@ class _TaskCardState extends State<TaskCard>
       key: Key(widget.task.id.toString()),
       groupTag: "0",
       endActionPane: ActionPane(
+        dismissible: DismissiblePane(
+          onDismissed: () {
+            repository.deleteTask(widget.task.id!);
+          },
+        ),
         motion: const DrawerMotion(),
         children: widget.task.archived
             ? [
@@ -67,6 +72,11 @@ class _TaskCardState extends State<TaskCard>
       ),
       startActionPane: ActionPane(
         motion: const DrawerMotion(),
+        dismissible: DismissiblePane(
+          onDismissed: () => repository.saveTask(
+            widget.task..archived = !widget.task.archived,
+          ),
+        ),
         children: [
           ArchiveAction(repository: repository, widget: widget),
         ],

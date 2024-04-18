@@ -39,12 +39,26 @@ class TasksScreen extends StatelessWidget {
                               .toList(),
                         ),
                       )
-                    : Center(
-                        child: Text(
-                        'Task list is empty. \nPress "+ New task" button',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ));
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Task list is empty',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          const SizedBox(height: 10),
+                          TextButton.icon(
+                            onPressed: () =>
+                                Scaffold.of(context).showBottomSheet(
+                              (context) =>
+                                  const TaskForm(title: "Add new task"),
+                            ),
+                            icon: const Icon(Icons.add),
+                            label: const Text("Create first task"),
+                          )
+                        ],
+                      );
               }),
         ),
       ],
