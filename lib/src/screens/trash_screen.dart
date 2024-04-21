@@ -92,8 +92,6 @@ class TrashBottomBar extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.delete_outline),
             onPressed: () {
-              // The function showDialog<T> returns Future<T>.
-              // Use Navigator.pop() to return value (of type T).
               showDialog<String>(
                 context: context,
                 builder: (BuildContext context) => AlertDialog(

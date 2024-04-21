@@ -85,21 +85,21 @@ class Repository {
 
   // migrations
   Future<void> performMigrationIfNeeded(SharedPreferences prefs) async {
-    final currentVersion = prefs.getInt('version') ?? 2;
+    const int lastVersion = 2;
+    final currentVersion = prefs.getInt('version') ?? lastVersion;
 
     switch (currentVersion) {
       case 1:
+        // add trash feature
         await migrateV1ToV2();
         break;
       case 2:
-        // If the version is not set (new installation) or already 2, we do not need to migrate
         return;
       default:
         throw Exception('Unknown version: $currentVersion');
     }
 
-    // Update version
-    await prefs.setInt('version', 1);
+    await prefs.setInt('version', lastVersion);
   }
 
   Future<void> migrateV1ToV2() async {
