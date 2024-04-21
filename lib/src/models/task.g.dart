@@ -36,6 +36,11 @@ const TaskSchema = CollectionSchema(
       id: 3,
       name: r'title',
       type: IsarType.string,
+    ),
+    r'trash': PropertySchema(
+      id: 4,
+      name: r'trash',
+      type: IsarType.bool,
     )
   },
   estimateSize: _taskEstimateSize,
@@ -73,6 +78,7 @@ void _taskSerialize(
   writer.writeBool(offsets[1], object.checked);
   writer.writeString(offsets[2], object.description);
   writer.writeString(offsets[3], object.title);
+  writer.writeBool(offsets[4], object.trash);
 }
 
 Task _taskDeserialize(
@@ -88,6 +94,7 @@ Task _taskDeserialize(
   object.archived = reader.readBool(offsets[0]);
   object.checked = reader.readBool(offsets[1]);
   object.id = id;
+  object.trash = reader.readBool(offsets[4]);
   return object;
 }
 
@@ -106,6 +113,8 @@ P _taskDeserializeProp<P>(
       return (reader.readString(offset)) as P;
     case 3:
       return (reader.readString(offset)) as P;
+    case 4:
+      return (reader.readBool(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -542,6 +551,15 @@ extension TaskQueryFilter on QueryBuilder<Task, Task, QFilterCondition> {
       ));
     });
   }
+
+  QueryBuilder<Task, Task, QAfterFilterCondition> trashEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'trash',
+        value: value,
+      ));
+    });
+  }
 }
 
 extension TaskQueryObject on QueryBuilder<Task, Task, QFilterCondition> {}
@@ -594,6 +612,18 @@ extension TaskQuerySortBy on QueryBuilder<Task, Task, QSortBy> {
   QueryBuilder<Task, Task, QAfterSortBy> sortByTitleDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'title', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Task, Task, QAfterSortBy> sortByTrash() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'trash', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Task, Task, QAfterSortBy> sortByTrashDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'trash', Sort.desc);
     });
   }
 }
@@ -658,6 +688,18 @@ extension TaskQuerySortThenBy on QueryBuilder<Task, Task, QSortThenBy> {
       return query.addSortBy(r'title', Sort.desc);
     });
   }
+
+  QueryBuilder<Task, Task, QAfterSortBy> thenByTrash() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'trash', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Task, Task, QAfterSortBy> thenByTrashDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'trash', Sort.desc);
+    });
+  }
 }
 
 extension TaskQueryWhereDistinct on QueryBuilder<Task, Task, QDistinct> {
@@ -684,6 +726,12 @@ extension TaskQueryWhereDistinct on QueryBuilder<Task, Task, QDistinct> {
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'title', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<Task, Task, QDistinct> distinctByTrash() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'trash');
     });
   }
 }
@@ -716,6 +764,12 @@ extension TaskQueryProperty on QueryBuilder<Task, Task, QQueryProperty> {
   QueryBuilder<Task, String, QQueryOperations> titleProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'title');
+    });
+  }
+
+  QueryBuilder<Task, bool, QQueryOperations> trashProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'trash');
     });
   }
 }

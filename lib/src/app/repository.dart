@@ -1,5 +1,6 @@
 import 'package:path_provider/path_provider.dart';
 import 'package:isar/isar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '/src/models/task.dart';
 
@@ -37,6 +38,7 @@ class Repository {
         .where()
         .filter()
         .archivedEqualTo(false)
+        .trashEqualTo(false)
         .watch(fireImmediately: true);
   }
 
@@ -47,6 +49,17 @@ class Repository {
         .where()
         .filter()
         .archivedEqualTo(true)
+        .trashEqualTo(false)
+        .watch(fireImmediately: true);
+  }
+
+  Stream<List<Task>> listenTrashTasks() async* {
+    var isar = await db;
+
+    yield* isar.tasks
+        .where()
+        .filter()
+        .trashEqualTo(true)
         .watch(fireImmediately: true);
   }
 
@@ -62,38 +75,41 @@ class Repository {
     isar.writeTxnSync(() => isar.tasks.deleteSync(id));
   }
 
-  Future<void> mockTasks() async {
-    await cleanDb();
-
+  Future<void> deleteTrashTasks() async {
     var isar = await db;
 
     isar.writeTxnSync(() {
-      isar.tasks.putSync(
-        Task(title: "Daily meeting with team", description: ""),
-      );
-      isar.tasks.putSync(
-        Task(title: "Pay for rent", description: "")..checked = true,
-      );
-      isar.tasks.putSync(
-        Task(title: "Check emails", description: ""),
-      );
-      isar.tasks.putSync(
-        Task(title: "Lunch with Emma", description: "Lorem ipsum dolor est"),
-      );
-      isar.tasks.putSync(
-        Task(title: "Meditation", description: ""),
-      );
+      isar.tasks.where().filter().trashEqualTo(true).deleteAllSync();
     });
   }
 
-  Future<void> migrate() async {
+  // migrations
+  Future<void> performMigrationIfNeeded(SharedPreferences prefs) async {
+    final currentVersion = prefs.getInt('version') ?? 2;
+
+    switch (currentVersion) {
+      case 1:
+        await migrateV1ToV2();
+        break;
+      case 2:
+        // If the version is not set (new installation) or already 2, we do not need to migrate
+        return;
+      default:
+        throw Exception('Unknown version: $currentVersion');
+    }
+
+    // Update version
+    await prefs.setInt('version', 1);
+  }
+
+  Future<void> migrateV1ToV2() async {
     var isar = await db;
 
     var tasks = isar.tasks.where().findAllSync();
 
     isar.writeTxnSync(() {
       for (var task in tasks) {
-        isar.tasks.putSync(task..archived = false);
+        isar.tasks.putSync(task..trash = false);
       }
     });
   }

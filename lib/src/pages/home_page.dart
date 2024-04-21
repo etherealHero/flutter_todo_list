@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '/src/app/layout.dart';
 import '/src/app/repository.dart';
 import '/src/pages/settings_page.dart';
+import '/src/screens/trash_screen.dart';
 import '/src/screens/archive_screen.dart';
 import '/src/screens/tasks_screen.dart';
 
@@ -19,7 +20,7 @@ class HomePageState extends State<HomePage> {
     Screens.tasks.title: tasksScreen,
     // "Categories": Text('Categories'),
     Screens.archive.title: archiveScreen,
-    // "Trash": const Text('Trash'),
+    Screens.trash.title: trashScreen,
   };
 
   void changeHomeScreen(Screens screen) {
@@ -48,22 +49,10 @@ class HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            ListTile(
-              leading: Screens.tasks.icon,
-              title: Text(Screens.tasks.title),
-              onTap: () {
-                changeHomeScreen(Screens.tasks);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: Screens.archive.icon,
-              title: Text(Screens.archive.title),
-              onTap: () {
-                changeHomeScreen(Screens.archive);
-                Navigator.pop(context);
-              },
-            ),
+            _buildMenuItem(context, Screens.tasks),
+            _buildMenuItem(context, Screens.archive),
+            const Divider(),
+            _buildMenuItem(context, Screens.trash),
             const Spacer(),
             ListTile(
               leading: const Icon(Icons.settings),
@@ -91,6 +80,17 @@ class HomePageState extends State<HomePage> {
         child: _screens[_selectedScreen]!.screen,
       ),
       drawer: drawer,
+    );
+  }
+
+  ListTile _buildMenuItem(BuildContext context, Screens screen) {
+    return ListTile(
+      leading: screen.icon,
+      title: Text(screen.title),
+      onTap: () {
+        changeHomeScreen(screen);
+        Navigator.pop(context);
+      },
     );
   }
 }

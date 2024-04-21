@@ -16,6 +16,7 @@ class ScreenLayout {
 
 enum Screens {
   tasks(title: "Tasks", icon: Icon(Icons.library_add_check_outlined)),
+  trash(title: "Trash", icon: Icon(Icons.delete_outline_rounded)),
   archive(title: "Archive", icon: Icon(Icons.archive_outlined));
 
   const Screens({

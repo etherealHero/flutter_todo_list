@@ -9,10 +9,12 @@ class Task {
   String description;
   bool checked;
   bool archived;
+  bool trash;
 
   Task({
     required this.title,
     required this.description,
   })  : checked = false,
-        archived = false;
+        archived = false,
+        trash = false;
 }

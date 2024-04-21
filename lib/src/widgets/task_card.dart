@@ -26,7 +26,7 @@ class _TaskCardState extends State<TaskCard>
   Widget build(BuildContext context) {
     var leading = Checkbox(
       value: widget.task.checked,
-      onChanged: !widget.task.archived
+      onChanged: !widget.task.archived && !widget.task.trash
           ? (v) => repository.saveTask(widget.task..checked = v!)
           : null,
     );
@@ -57,11 +57,15 @@ class _TaskCardState extends State<TaskCard>
       endActionPane: ActionPane(
         dismissible: DismissiblePane(
           onDismissed: () {
-            repository.deleteTask(widget.task.id!);
+            if (widget.task.trash) {
+              repository.deleteTask(widget.task.id!);
+            } else {
+              repository.saveTask(widget.task..trash = true);
+            }
           },
         ),
         motion: const DrawerMotion(),
-        children: widget.task.archived
+        children: widget.task.archived || widget.task.trash
             ? [
                 DeleteAction(repository: repository, widget: widget),
               ]
@@ -73,9 +77,19 @@ class _TaskCardState extends State<TaskCard>
       startActionPane: ActionPane(
         motion: const DrawerMotion(),
         dismissible: DismissiblePane(
-          onDismissed: () => repository.saveTask(
-            widget.task..archived = !widget.task.archived,
-          ),
+          onDismissed: () {
+            if (widget.task.trash) {
+              repository.saveTask(
+                widget.task
+                  ..trash = false
+                  ..archived = false,
+              );
+            } else {
+              repository.saveTask(
+                widget.task..archived = !widget.task.archived,
+              );
+            }
+          },
         ),
         children: [
           ArchiveAction(repository: repository, widget: widget),
@@ -113,9 +127,19 @@ class ArchiveAction extends StatelessWidget {
     return CustomSlidableAction(
       padding: EdgeInsets.zero,
       backgroundColor: Colors.transparent,
-      onPressed: (context) => repository.saveTask(
-        widget.task..archived = !widget.task.archived,
-      ),
+      onPressed: (context) {
+        if (widget.task.trash) {
+          repository.saveTask(
+            widget.task
+              ..trash = false
+              ..archived = false,
+          );
+        } else {
+          repository.saveTask(
+            widget.task..archived = !widget.task.archived,
+          );
+        }
+      },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
         height: double.infinity,
@@ -127,7 +151,11 @@ class ArchiveAction extends StatelessWidget {
             Radius.circular(10),
           ),
         ),
-        child: Text(widget.task.archived ? 'Unarchive' : 'Archive'),
+        child: Text(widget.task.trash
+            ? 'Restore'
+            : widget.task.archived
+                ? 'Unarchive'
+                : 'Archive'),
       ),
     );
   }
@@ -148,7 +176,13 @@ class DeleteAction extends StatelessWidget {
     return CustomSlidableAction(
       padding: EdgeInsets.zero,
       backgroundColor: Colors.transparent,
-      onPressed: (context) => repository.deleteTask(widget.task.id!),
+      onPressed: (context) {
+        if (widget.task.trash) {
+          repository.deleteTask(widget.task.id!);
+        } else {
+          repository.saveTask(widget.task..trash = true);
+        }
+      },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
         height: double.infinity,
@@ -160,7 +194,7 @@ class DeleteAction extends StatelessWidget {
             Radius.circular(10),
           ),
         ),
-        child: const Text('Delete'),
+        child: Text(widget.task.trash ? 'Delete' : 'Trash'),
       ),
     );
   }

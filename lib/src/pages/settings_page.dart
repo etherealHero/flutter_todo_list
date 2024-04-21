@@ -41,15 +41,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ],
             ),
-            const Spacer(),
-            ListTile(
-              leading: const Icon(Icons.restart_alt),
-              title: const Text('Migrate'),
-              onTap: () {
-                Navigator.pop(context);
-                repository.migrate();
-              },
-            ),
           ],
         ),
       ),
