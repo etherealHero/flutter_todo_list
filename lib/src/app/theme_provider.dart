@@ -1,24 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+enum EThemeMode { light, system, dark }
+
 class ThemeController extends ChangeNotifier {
   static const themePrefKey = 'theme';
 
   ThemeController(this._prefs) {
-    _currentTheme = _prefs.getString(themePrefKey) ?? 'light';
+    _currentTheme = switch (_prefs.getString(themePrefKey)) {
+      'system' => EThemeMode.system,
+      'light' => EThemeMode.light,
+      'dark' => EThemeMode.dark,
+      _ => EThemeMode.system,
+    };
   }
 
   final SharedPreferences _prefs;
-  late String _currentTheme;
+  late EThemeMode _currentTheme;
 
-  String get currentTheme => _currentTheme;
+  EThemeMode get currentTheme => _currentTheme;
 
-  void setTheme(String theme) {
+  void setTheme(EThemeMode theme) {
     _currentTheme = theme;
 
     notifyListeners();
 
-    _prefs.setString(themePrefKey, theme);
+    _prefs.setString(themePrefKey, theme.name);
   }
 
   static ThemeController of(BuildContext context) {

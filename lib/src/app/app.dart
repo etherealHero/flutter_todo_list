@@ -39,11 +39,13 @@ class App extends StatelessWidget {
 
   ThemeMode _buildCurrentTheme() {
     switch (themeController.currentTheme) {
-      case "dark":
+      case EThemeMode.dark:
         return ThemeMode.dark;
-      case "light":
-      default:
+      case EThemeMode.light:
         return ThemeMode.light;
+      case EThemeMode.system:
+      default:
+        return ThemeMode.system;
     }
   }
 }

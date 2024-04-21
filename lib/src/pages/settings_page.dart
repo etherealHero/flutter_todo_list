@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '/src/app/theme_provider.dart';
 import '/src/app/repository.dart';
+import '/src/widgets/theme_mode_choice.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -20,27 +20,14 @@ class _SettingsPageState extends State<SettingsPage> {
         leading: const BackButton(),
         title: const Text('Settings'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(15.0),
+      body: const Padding(
+        padding: EdgeInsets.all(15.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Row(
-              children: [
-                const Text('Dark mode'),
-                const SizedBox(width: 10),
-                Switch(
-                  onChanged: (bool value) {
-                    if (ThemeController.of(context).currentTheme == "dark") {
-                      ThemeController.of(context).setTheme("light");
-                    } else {
-                      ThemeController.of(context).setTheme("dark");
-                    }
-                    setState(() {});
-                  },
-                  value: ThemeController.of(context).currentTheme == "dark",
-                ),
-              ],
-            ),
+            Text('Theme'),
+            SizedBox(height: 10),
+            ThemeModeChoice(),
           ],
         ),
       ),
