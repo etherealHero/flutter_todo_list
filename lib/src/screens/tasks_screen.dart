@@ -53,6 +53,7 @@ class TasksScreen extends StatelessWidget {
                                 Scaffold.of(context).showBottomSheet(
                               (context) =>
                                   const TaskForm(title: "Add new task"),
+                              enableDrag: false,
                             ),
                             icon: const Icon(Icons.add),
                             label: const Text("Create first task"),
@@ -84,6 +85,7 @@ class TasksBottomBar extends StatelessWidget {
                 padding: const EdgeInsets.all(20)),
             onPressed: () => Scaffold.of(context).showBottomSheet(
               (context) => const TaskForm(title: "Add new task"),
+              enableDrag: false,
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,

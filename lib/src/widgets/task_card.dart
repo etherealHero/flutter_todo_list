@@ -214,7 +214,9 @@ class EditAction extends StatelessWidget {
       padding: EdgeInsets.zero,
       backgroundColor: Colors.transparent,
       onPressed: (context) => Scaffold.of(context).showBottomSheet(
-          (context) => TaskForm(title: "Edit task", task: widget.task)),
+        (context) => TaskForm(title: "Edit task", task: widget.task),
+        enableDrag: false,
+      ),
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
         height: double.infinity,

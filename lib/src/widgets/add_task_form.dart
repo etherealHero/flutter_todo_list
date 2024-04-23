@@ -40,7 +40,7 @@ class _TaskFormState extends State<TaskForm> {
 
   @override
   Widget build(BuildContext context) {
-    return TapRegion(
+    return TextFieldTapRegion(
       onTapOutside: (_) => Navigator.pop(context),
       child: Container(
         padding: const EdgeInsets.all(8.0),
