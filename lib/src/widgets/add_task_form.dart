@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '/src/app/repository.dart';
+import '/src/models/bloc/tasks_bloc.dart';
 import '/src/models/task.dart';
 
 class TaskForm extends StatefulWidget {
@@ -14,8 +15,6 @@ class TaskForm extends StatefulWidget {
 }
 
 class _TaskFormState extends State<TaskForm> {
-  final repository = Repository();
-
   final _formKey = GlobalKey<FormState>();
   late FocusNode _titleFocusNode;
 
@@ -109,12 +108,16 @@ class _TaskFormState extends State<TaskForm> {
                         widget.task!.title = _titleController.text.trim();
                         widget.task!.description = _descriptionController.text;
 
-                        await repository.saveTask(widget.task!);
+                        context.read<TasksBloc>().add(
+                            TasksEventUpdateTask(modifiedTask: widget.task!));
                       } else {
-                        await repository.saveTask(Task(
-                          title: _titleController.text.trim(),
-                          description: _descriptionController.text,
-                        ));
+                        context.read<TasksBloc>().add(
+                              TasksEventAddTask(
+                                  newTask: Task(
+                                title: _titleController.text.trim(),
+                                description: _descriptionController.text,
+                              )),
+                            );
                       }
 
                       if (!context.mounted) return;

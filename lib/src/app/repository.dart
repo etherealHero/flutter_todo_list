@@ -42,6 +42,12 @@ class Repository {
         .watch(fireImmediately: true);
   }
 
+  Future<List<Task>> getTasks() async {
+    var isar = await db;
+
+    return isar.tasks.where().findAllSync();
+  }
+
   Stream<List<Task>> listenArchivedTasks() async* {
     var isar = await db;
 

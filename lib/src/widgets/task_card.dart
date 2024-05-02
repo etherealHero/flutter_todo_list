@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
+import '/src/models/bloc/tasks_bloc.dart';
 import '/src/models/task.dart';
-import '/src/app/repository.dart';
 import '/src/widgets/add_task_form.dart';
 
 class TaskCard extends StatefulWidget {
@@ -20,14 +21,14 @@ class TaskCard extends StatefulWidget {
 class _TaskCardState extends State<TaskCard>
     with SingleTickerProviderStateMixin {
   late final controller = SlidableController(this);
-  final repository = Repository();
 
   @override
   Widget build(BuildContext context) {
     var leading = Checkbox(
       value: widget.task.checked,
       onChanged: !widget.task.archived && !widget.task.trash
-          ? (v) => repository.saveTask(widget.task..checked = v!)
+          ? (v) => context.read<TasksBloc>().add(
+              TasksEventUpdateTask(modifiedTask: widget.task..checked = v!))
           : null,
     );
     var title = Text(
@@ -58,20 +59,24 @@ class _TaskCardState extends State<TaskCard>
         dismissible: DismissiblePane(
           onDismissed: () {
             if (widget.task.trash) {
-              repository.deleteTask(widget.task.id!);
+              context
+                  .read<TasksBloc>()
+                  .add(TasksEventDeleteTask(taskId: widget.task.id!));
             } else {
-              repository.saveTask(widget.task..trash = true);
+              context
+                  .read<TasksBloc>()
+                  .add(TasksEventTrashTask(task: widget.task));
             }
           },
         ),
         motion: const DrawerMotion(),
         children: widget.task.archived || widget.task.trash
             ? [
-                DeleteAction(repository: repository, widget: widget),
+                DeleteAction(widget: widget),
               ]
             : [
                 EditAction(widget: widget),
-                DeleteAction(repository: repository, widget: widget),
+                DeleteAction(widget: widget),
               ],
       ),
       startActionPane: ActionPane(
@@ -79,20 +84,21 @@ class _TaskCardState extends State<TaskCard>
         dismissible: DismissiblePane(
           onDismissed: () {
             if (widget.task.trash) {
-              repository.saveTask(
-                widget.task
-                  ..trash = false
-                  ..archived = false,
-              );
+              context
+                  .read<TasksBloc>()
+                  .add(TasksEventRestoreTask(taskId: widget.task.id!));
             } else {
-              repository.saveTask(
-                widget.task..archived = !widget.task.archived,
-              );
+              context.read<TasksBloc>().add(
+                    TasksEventUpdateTask(
+                      modifiedTask: widget.task
+                        ..archived = !widget.task.archived,
+                    ),
+                  );
             }
           },
         ),
         children: [
-          ArchiveAction(repository: repository, widget: widget),
+          ArchiveAction(widget: widget),
         ],
       ),
       child: Card(
@@ -115,11 +121,9 @@ class _TaskCardState extends State<TaskCard>
 class ArchiveAction extends StatelessWidget {
   const ArchiveAction({
     super.key,
-    required this.repository,
     required this.widget,
   });
 
-  final Repository repository;
   final TaskCard widget;
 
   @override
@@ -129,15 +133,19 @@ class ArchiveAction extends StatelessWidget {
       backgroundColor: Colors.transparent,
       onPressed: (context) {
         if (widget.task.trash) {
-          repository.saveTask(
-            widget.task
-              ..trash = false
-              ..archived = false,
-          );
+          context.read<TasksBloc>().add(
+                TasksEventUpdateTask(
+                  modifiedTask: widget.task
+                    ..trash = false
+                    ..archived = false,
+                ),
+              );
         } else {
-          repository.saveTask(
-            widget.task..archived = !widget.task.archived,
-          );
+          context.read<TasksBloc>().add(
+                TasksEventUpdateTask(
+                  modifiedTask: widget.task..archived = !widget.task.archived,
+                ),
+              );
         }
       },
       child: Container(
@@ -164,11 +172,9 @@ class ArchiveAction extends StatelessWidget {
 class DeleteAction extends StatelessWidget {
   const DeleteAction({
     super.key,
-    required this.repository,
     required this.widget,
   });
 
-  final Repository repository;
   final TaskCard widget;
 
   @override
@@ -178,9 +184,11 @@ class DeleteAction extends StatelessWidget {
       backgroundColor: Colors.transparent,
       onPressed: (context) {
         if (widget.task.trash) {
-          repository.deleteTask(widget.task.id!);
+          context
+              .read<TasksBloc>()
+              .add(TasksEventDeleteTask(taskId: widget.task.id!));
         } else {
-          repository.saveTask(widget.task..trash = true);
+          context.read<TasksBloc>().add(TasksEventTrashTask(task: widget.task));
         }
       },
       child: Container(

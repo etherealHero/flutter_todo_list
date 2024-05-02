@@ -1,66 +1,71 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
-import '/src/app/repository.dart';
 import '/src/app/layout.dart';
+import '/src/models/bloc/tasks_bloc.dart';
 import '/src/models/task.dart';
 import '/src/widgets/task_card.dart';
 import '/src/widgets/add_task_form.dart';
 
 var tasksScreen = ScreenLayout(
-  screen: TasksScreen(),
+  screen: const TasksScreen(),
   bottomNavigationBar: const TasksBottomBar(),
 );
 
 class TasksScreen extends StatelessWidget {
-  TasksScreen({super.key});
-
-  final repository = Repository();
+  const TasksScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Expanded(
-          child: StreamBuilder<List<Task>>(
-              stream: repository.listenTasks(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const CircularProgressIndicator();
-                }
+        BlocBuilder<TasksBloc, TasksState>(
+          builder: (context, state) {
+            if (state is TasksStateFetchingTasks) {
+              return const CircularProgressIndicator();
+            }
 
-                return snapshot.hasData && snapshot.data!.isNotEmpty
-                    ? SlidableAutoCloseBehavior(
-                        child: ListView(
-                          children: snapshot.data!
-                              .map(
-                                (task) => TaskCard(task),
-                              )
-                              .toList(),
+            if (state is TasksStateLoadedTasks && state.tasks.isNotEmpty) {
+              Iterable<Task> tasks = state.tasks.where(
+                (t) => !t.archived && !t.trash,
+              );
+
+              if (tasks.isNotEmpty) {
+                return Expanded(
+                  child: SlidableAutoCloseBehavior(
+                    child: ListView(
+                      children: tasks.map((task) => TaskCard(task)).toList(),
+                    ),
+                  ),
+                );
+              } else {
+                return Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Task list is empty',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 10),
+                      TextButton.icon(
+                        onPressed: () => Scaffold.of(context).showBottomSheet(
+                          (context) => const TaskForm(title: "Add new task"),
+                          enableDrag: false,
                         ),
+                        icon: const Icon(Icons.add),
+                        label: const Text("Create first task"),
                       )
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Task list is empty',
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          const SizedBox(height: 10),
-                          TextButton.icon(
-                            onPressed: () =>
-                                Scaffold.of(context).showBottomSheet(
-                              (context) =>
-                                  const TaskForm(title: "Add new task"),
-                              enableDrag: false,
-                            ),
-                            icon: const Icon(Icons.add),
-                            label: const Text("Create first task"),
-                          )
-                        ],
-                      );
-              }),
+                    ],
+                  ),
+                );
+              }
+            }
+
+            return const Text('lorem');
+          },
         ),
       ],
     );
