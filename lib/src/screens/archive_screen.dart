@@ -26,7 +26,7 @@ class ArchiveScreen extends StatelessWidget {
               return const CircularProgressIndicator();
             }
 
-            if (state is TasksStateLoadedTasks && state.tasks.isNotEmpty) {
+            if (state is TasksStateLoadedTasks) {
               Iterable<Task> tasks = state.tasks.where(
                 (t) => t.archived && !t.trash,
               );
