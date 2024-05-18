@@ -12,9 +12,9 @@ void main() async {
 
   await Repository().performMigrationIfNeeded(prefs);
 
-  final themeController = ThemeController(prefs);
-
   Bloc.observer = const AppBlocObserver();
 
-  runApp(App(themeController: themeController));
+  runApp(App(
+    themeController: ThemeController(prefs),
+  ));
 }

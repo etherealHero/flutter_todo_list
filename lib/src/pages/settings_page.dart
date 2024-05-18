@@ -27,7 +27,7 @@ class _SettingsPageState extends State<SettingsPage> {
           children: <Widget>[
             Text('Theme'),
             SizedBox(height: 10),
-            ThemeModeChoice(),
+            ChoiceTheme(),
           ],
         ),
       ),

@@ -1,48 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum EThemeMode { light, system, dark }
-
 class ThemeController extends ChangeNotifier {
   static const themePrefKey = 'theme';
 
   ThemeController(this._prefs) {
     _currentTheme = switch (_prefs.getString(themePrefKey)) {
-      'system' => EThemeMode.system,
-      'light' => EThemeMode.light,
-      'dark' => EThemeMode.dark,
-      _ => EThemeMode.system,
+      'system' => ThemeMode.system,
+      'light' => ThemeMode.light,
+      'dark' => ThemeMode.dark,
+      _ => ThemeMode.system,
     };
   }
 
   final SharedPreferences _prefs;
-  late EThemeMode _currentTheme;
+  late ThemeMode _currentTheme;
 
-  EThemeMode get currentTheme => _currentTheme;
+  ThemeMode get currentTheme => _currentTheme;
 
-  void setTheme(EThemeMode theme) {
+  void setTheme(ThemeMode theme) {
     _currentTheme = theme;
-
-    notifyListeners();
-
     _prefs.setString(themePrefKey, theme.name);
+    notifyListeners();
   }
 
   static ThemeController of(BuildContext context) {
-    final provider =
-        context.getInheritedWidgetOfExactType<ThemeControllerProvider>()
-            as ThemeControllerProvider;
-    return provider.controller;
+    final provider = context.getInheritedWidgetOfExactType<ThemeProvider>();
+    return (provider as ThemeProvider).controller;
   }
 }
 
-class ThemeControllerProvider extends InheritedWidget {
-  const ThemeControllerProvider(
-      {super.key, required this.controller, required super.child});
+class ThemeProvider extends InheritedWidget {
+  ThemeProvider({
+    super.key,
+    required this.controller,
+    required Widget Function(BuildContext, Widget?) builder,
+  }) : super(child: AnimatedBuilder(animation: controller, builder: builder));
 
   final ThemeController controller;
 
   @override
-  bool updateShouldNotify(ThemeControllerProvider oldWidget) =>
+  bool updateShouldNotify(ThemeProvider oldWidget) =>
       controller != oldWidget.controller;
 }
